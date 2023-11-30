@@ -93,3 +93,130 @@ function generateFromNestedString(string) {
 }
 
 console.log(generateFromNestedString('3[as2[df]]2[gh]'))
+
+// Challenges from Nov 24th
+
+/* You are going to be given a word. Your job is to return the middle character of the word. 
+If the word's length is odd, return the middle character. 
+If the word's length is even, return the middle 2 characters.
+
+#Examples:
+getMiddle("test") should return "es"
+getMiddle("testing") should return "t"
+getMiddle("middle") should return "dd"
+getMiddle("A") should return "A" */
+
+function getMiddle(string) {
+    let cutString = string;
+    while (cutString.length > 2) {
+        cutString = getMiddle(cutString.slice(1, -1))
+    }
+    return cutString;
+}
+
+console.log(getMiddle("testing"))
+console.log(getMiddle("test"))
+console.log(getMiddle("middle"))
+console.log(getMiddle("A"))
+
+/*Create the function prefill that returns an array of n elements that all have the same value v. See if you can do this without using a loop.
+
+You have to validate input:
+
+    v can be anything (primitive or otherwise)
+    if v is omitted, fill the array with undefined
+    if n is 0, return an empty array
+    if n is anything other than an integer or integer-formatted string (e.g. '123') that is >=0, throw a TypeError
+
+When throwing a TypeError, the message should be n is invalid, where you replace n for the actual value passed to the function.
+
+Code Examples
+
+    prefill(3,1) --> [1,1,1]
+    
+    prefill(2,"abc") --> ['abc','abc']
+    
+    prefill("1", 1) --> [1]
+    
+    prefill(3, prefill(2,'2d'))
+      --> [['2d','2d'],['2d','2d'],['2d','2d']]
+      
+    prefill("xyz", 1)
+      --> throws TypeError with message "xyz is invalid" */
+
+function prefill(n, v) {
+    if (isNaN(n) || n < 0) {
+        throw new TypeError(`${n} is invalid`)
+    } else {
+        return Array(n).fill(v);
+    }
+
+}
+
+console.log(prefill(3, 1));
+console.log(prefill(2, "abc"))
+console.log(prefill("1", 1))
+console.log(prefill(3, prefill(2, '2d')))
+console.log(prefill("0", 1))
+console.log(prefill(3))
+// console.log(prefill("-1", 1))
+
+/* Make a Cat constructor that takes arguments name and weight to instantiate a new cat object. 
+The constructor should also have an averageWeight method that returns the average weight of cats created with the constructor.
+
+garfield = new Cat('garfield', 25);
+averageWeight(); // 25
+
+felix = new Cat('felix', 15);
+averageWeight();   // now 20
+
+Cats can change weight. Use Object.defineProperty to write custom setters and getters for the weight 
+property so that the following works properly even as instances change their weight value:
+
+felix.weight = 25;
+felix.weight // 25
+averageWeight(); // now 25
+
+Throw an error if name or weight not specified when invoking the constructor.
+
+averageWeight() method should give the average weight of all cat instances created with Cat, 
+even after if the instance's properties have changed. */
+
+const Cat = (function () {
+    let count = 0;
+    let weightSum = 0;
+    let calculatedWeight = 0;
+
+    function InnerConstructor(name, weight) {
+        if (!name || !weight) {
+            throw new Error('Please specify both name and weight');
+        }
+
+        this.name = name;
+
+        count++;
+
+        Object.defineProperty(this, 'weight', {
+            get() {
+                return this.catWeight || 0;
+            },
+            set(value) {
+                weightSum = weightSum - this.weight + value;
+                calculatedWeight = weightSum / count;
+                this.catWeight = value;
+            },
+        })
+        this.weight = weight;
+
+    }
+    InnerConstructor.averageWeight = () => calculatedWeight;
+
+    return InnerConstructor;
+})();
+
+const garfield = new Cat('garfield', 25);
+console.log('avg weight:', Cat.averageWeight())
+const felix = new Cat('felix', 15);
+console.log('avg weight:', Cat.averageWeight())
+felix.weight = 30;
+console.log('avg weight:', Cat.averageWeight())
